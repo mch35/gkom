@@ -94,56 +94,6 @@ void init()
 
 	//cieniowanie interpolowane
 	glShadeModel(GL_SMOOTH);
-	/*
-	skybox[0] = SOIL_load_OGL_texture("img/right.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	skybox[1] = SOIL_load_OGL_texture("img/left.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	skybox[2] = SOIL_load_OGL_texture("img/top.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	skybox[3] = SOIL_load_OGL_texture("img/bottom.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	skybox[4] = SOIL_load_OGL_texture("img/back.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	skybox[5] = SOIL_load_OGL_texture("img/front.jpg", 
-                               SOIL_LOAD_AUTO, 
-                               SOIL_CREATE_NEW_ID,
-                               SOIL_FLAG_MIPMAPS |
-							   SOIL_FLAG_INVERT_Y |
-                               SOIL_FLAG_COMPRESS_TO_DXT);
-
-	for(int i = 0; i < 6; i++)
-	{
-		if( 0 == skybox[i] )
-		{
-			printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
-		}
-	}*/
 
 }
 
@@ -174,7 +124,6 @@ float eye(const float x)
 
 typedef float(*foo)(const float);
 
-// TODO nie generuje jednego segmentu pionowo
 void lathe(foo fun, float begin, float end, int verticalSegments = 10, int horizontalSegments = 36, float radius = 2)
 {
 	// krok pionowo
@@ -624,6 +573,7 @@ void display()
     // Just in case we set all vertices to white.
     glColor3f(0.5,0.5,0.5);
 
+	// rysowanie skyboxa
 	skybox->draw();
  
     // Restore enable bits and matrix
