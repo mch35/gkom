@@ -6,8 +6,21 @@
 #include <string>
 
 
-namespace Skybox 
+namespace skybox 
 {
+	/**
+	 * Pozycja tekstury w skyboxie
+	 */
+	enum TexPosition
+	{
+		TX_FRONT = 0,
+		TX_BACK = 1,
+		TX_LEFT = 2,
+		TX_RIGHT = 3,
+		TX_TOP = 4,
+		TX_BOTTOM = 5
+	};
+
 	/**
 	 * Klasa reprezentujaca skybox
 	 *
@@ -29,19 +42,6 @@ namespace Skybox
 			 * Rysuje skybox
 			 */
 			void draw();
-	};
-
-	/**
-	 * Pozycja tekstury w skyboxie
-	 */
-	enum TexPosition
-	{
-		TX_FRONT,
-		TX_BACK,
-		TX_LEFT,
-		TX_RIGHT,
-		TX_TOP,
-		TX_BOTTOM
-	};
+	};	
 }
 #endif
