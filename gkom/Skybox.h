@@ -3,10 +3,11 @@
 
 #include <Windows.h>
 #include <GL/gl.h>
-#include <string>
+#include "glut.h"
+#include "SOIL.h"
 
 
-namespace skybox 
+namespace _skybox 
 {
 	/**
 	 * Pozycja tekstury w skyboxie
@@ -36,7 +37,7 @@ namespace skybox
 			/**
 			 * Laduje teksture na dana pozycje
 			 */
-			const bool loadTexture(const TexPosition texPosition, const std::string src);
+			const bool loadTexture(const TexPosition texPosition, const char* src);
 
 			/**
 			 * Rysuje skybox

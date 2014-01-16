@@ -13,6 +13,8 @@
 
 #include <iostream>
 
+#include "Skybox.h"
+
 GLdouble eyex = 0;
 GLdouble eyey = 0;
 GLdouble eyez = 0;
@@ -42,12 +44,14 @@ float angleYZ = 90;
 float l = 0;
 
 float sensitivity = -0.5f;
-GLuint skybox[6];
+//GLuint skybox[6];
 
 GLfloat mat_ambient[]    = { 0.2, 0.2,  0.2, 1.0 };
-    GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
-    //GLfloat light_position[] = { 0.0, 10.0, 10.0, 1.0 };
-    GLfloat lm_ambient[]     = { l, l, l, 1 };
+GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
+//GLfloat light_position[] = { 0.0, 10.0, 10.0, 1.0 };
+GLfloat lm_ambient[]     = { l, l, l, 1 };
+
+_skybox::Skybox* skybox;
 
 void init()
 {
@@ -90,7 +94,7 @@ void init()
 
 	//cieniowanie interpolowane
 	glShadeModel(GL_SMOOTH);
-	
+	/*
 	skybox[0] = SOIL_load_OGL_texture("img/right.jpg", 
                                SOIL_LOAD_AUTO, 
                                SOIL_CREATE_NEW_ID,
@@ -139,7 +143,7 @@ void init()
 		{
 			printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
 		}
-	}
+	}*/
 
 }
 
@@ -619,85 +623,8 @@ void display()
  
     // Just in case we set all vertices to white.
     glColor3f(0.5,0.5,0.5);
- 
-    // Render the front quad
-    glBindTexture(GL_TEXTURE_2D, skybox[5]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
-        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
-        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
-        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
-    glEnd();
- 
-    // Render the left quad
-    glBindTexture(GL_TEXTURE_2D, skybox[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
-        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
-        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
-    glEnd();
- 
-    // Render the back quad
-    glBindTexture(GL_TEXTURE_2D, skybox[4]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
-        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
- 
-    glEnd();
- 
-    // Render the right quad
-    glBindTexture(GL_TEXTURE_2D, skybox[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
-        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
-        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
-    glEnd();
- 
-    // Render the top quad
-    glBindTexture(GL_TEXTURE_2D, skybox[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(1, 0); glVertex3f( -0.5f,  0.5f, -0.5f );
-        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
-        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
-        glTexCoord2f(0, 0); glVertex3f(  0.5f,  0.5f, -0.5f );
-    glEnd();
- 
-    // Render the bottom quad
-    glBindTexture(GL_TEXTURE_2D, skybox[3]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
-        glTexCoord2f(0, 1); glVertex3f( -0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 1); glVertex3f(  0.5f, -0.5f,  0.5f );
-        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
-    glEnd();
+
+	skybox->draw();
  
     // Restore enable bits and matrix
     glPopAttrib();
@@ -902,6 +829,7 @@ int main(int argc, char** argv)
 
    glutIdleFunc(display);
 
+   skybox = new _skybox::Skybox();
    init();
    
    oldTime = glutGet(GLUT_ELAPSED_TIME);
