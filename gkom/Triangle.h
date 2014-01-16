@@ -6,17 +6,17 @@
 class Triangle
 {
 	private:
-		const Vertex** vertices;
+		Vertex** vertices;
 
 		const float normalX;
 		const float normalY;
 		const float normalZ;
 
 	public:
-		Triangle(const Vertex* vertexX, const Vertex* vertexY, const Vertex* vertexZ,
+		Triangle(Vertex* vertexX, Vertex* vertexY, Vertex* vertexZ,
 			   const float nx = 0, const float ny = 0, const float nz = 0) : normalX(nx), normalY(ny), normalZ(nz)
 		{
-			*vertices = new (Vertex*)[3];
+			vertices = new Vertex*[3];
 			vertices[0] = vertexX;
 			vertices[1] = vertexY;
 			vertices[2] = vertexZ;
@@ -28,10 +28,10 @@ class Triangle
 			delete vertices[1];
 			delete vertices[2];
 
-			delete vertices;
+			delete[] vertices;
 		}
-		
-		const Vertex** getVertices() const
+
+		Vertex** getVertices() const
 		{
 			return vertices;
 		}

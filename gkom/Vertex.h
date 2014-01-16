@@ -20,76 +20,26 @@ class Vertex
 		const float textureY;
 
 	public:
+		static long vertexCounter;
+
 		Vertex(const float x, const float y, const float z,
 			   const float nx, const float ny, const float nz,
 			   const float cr = 0, const float cg = 0, const float cb = 0,
-			   const float tx = 0, const float ty = 0) : x(x), y(y), z(z),
-												 normalX(nx), normalY(ny), normalZ(nz),
-												 colorR(cr), colorG(cg), colorB(cb),
-												 textureX(tx), textureY(ty)
-		{
+			   const float tx = 0, const float ty = 0);
 
-		}
-
-		~Vertex()
-		{
-
-		}
+		~Vertex();
 		
-		const float getX() const
-		{
-			return x;
-		}
-		
-		const float getY() const
-		{
-			return y;
-		}
-
-		const float getZ() const
-		{
-			return z;
-		}
-
-		const float getNormalX() const
-		{
-			return normalX;
-		}
-		
-		const float getNormalY() const
-		{
-			return normalY;
-		}
-
-		const float getNormalZ() const
-		{
-			return normalZ;
-		}
-
-		const float getColorR() const
-		{
-			return colorR;
-		}
-		
-		const float getColorG() const
-		{
-			return colorG;
-		}
-
-		const float getColorB() const
-		{
-			return colorB;
-		}
-
-		const float getTextureX() const
-		{
-			return textureX;
-		}
-
-		const float getTextureY() const
-		{
-			return textureY;
-		}
+		const float getX() const;		
+		const float getY() const;
+		const float getZ() const;
+		const float getNormalX() const;		
+		const float getNormalY() const;
+		const float getNormalZ() const;
+		const float getColorR() const;
+		const float getColorG() const;
+		const float getColorB() const;
+		const float getTextureX() const;
+		const float getTextureY() const;
 };
 
 #endif

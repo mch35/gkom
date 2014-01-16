@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "Skybox.h"
+#include "Dragonfly.h"
 
 GLdouble eyex = 0;
 GLdouble eyey = 0;
@@ -52,6 +53,7 @@ GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
 GLfloat lm_ambient[]     = { l, l, l, 1 };
 
 _skybox::Skybox* skybox;
+Dragonfly* dragonfly;
 
 void init()
 {
@@ -97,367 +99,13 @@ void init()
 
 }
 
-float edge(const float x)
-{
-	return -x*x*0.3;
-}
-
-float tail(const float x)
-{
-	return 2+x/(x+0.5)*(-0.2*x);
-}
-
-float body(const float x)
-{
-	return -(x*x*x*x*x*x)+1.5;
-}
-
-float beak(const float x)
-{
-	return 5+x/(x+0.5)*(-6*x);
-}
-
-float eye(const float x)
-{
-	return cos(x);
-}
-
-typedef float(*foo)(const float);
-
-void lathe(foo fun, float begin, float end, int verticalSegments = 10, int horizontalSegments = 36, float radius = 2)
-{
-	// krok pionowo
-	float vertStep = abs(end - begin) / verticalSegments;
-	// krok poziomo w radianach
-	float horizStep = 360 / horizontalSegments * M_PI / 180;
-
-	//std::cout << "vert: " << vertStep << " horiz: " << horizStep << std::endl;
-
-	float upperY;
-	float lowerY;
-	
-			//glBegin(GL_TRIANGLE_STRIP);
-	glBegin(GL_TRIANGLES);
-	for(float currentX = begin; currentX < end; currentX += vertStep)
-	{
-		upperY = fun(currentX);
-
-		if((currentX + vertStep) > end)
-		{
-			lowerY = fun(end);
-		}
-		else
-		{
-			lowerY = fun(currentX + vertStep);
-		}
-
-		//std::cout << "upperY: " << upperY << " lowerY: " << lowerY << std::endl;
-
-		for(int angleStep = 0; angleStep < horizontalSegments; ++angleStep)
-		{
-			// angle to kat obrotu danych wierzcholkow od poczatku obrotu
-			float angle = angleStep * horizStep;
-			// upperRadius to promien bryly na wyzszym poziomie
-			float upperRadius = radius + upperY;
-			// lowerRadius to promien bryly na nizszym poziomie
-			float lowerRadius = radius + lowerY;
-
-			float v1[3];
-			v1[0] = upperRadius * cos(angle);
-			v1[1] = currentX;
-			v1[2] = upperRadius * sin(angle);
-
-			float v2[3];
-			v2[0] = lowerRadius * cos(angle);
-			v2[1] = currentX+vertStep;
-			v2[2] = lowerRadius * sin(angle);
-			
-			angle = (angleStep+1) * horizStep;
-			float v3[3];
-			v3[0] = upperRadius * cos(angle);
-			v3[1] = currentX;
-			v3[2] = upperRadius * sin(angle);
-
-			float b[3];
-			b[0] = v1[0] - v2[0];
-			b[1] = v1[1] - v2[1];
-			b[2] = v1[2] - v2[2];
-
-			float a[3];
-			a[0] = v3[0] - v1[0];
-			a[1] = v3[1] - v1[1];
-			a[2] = v3[2] - v1[2];
-
-			float xn = a[1] * b[2] - a[2] * b[1];
-			float yn = a[2] * b[0] - a[0] * b[2];
-			float zn = a[0] * b[1] - a[1] * b[0];
-
-			glNormal3f(xn, yn, zn);
-			glVertex3f(v1[0], v1[1], v1[2]);	// 1
-			glVertex3f(v2[0], v2[1], v2[2]);	// 2
-			glVertex3f(v3[0], v3[1], v3[2]);	// 3
-
-			v1[0] = upperRadius * cos(angle);
-			v1[1] = currentX;
-			v1[2] = upperRadius * sin(angle);
-
-			v2[0] = lowerRadius * cos(angle);
-			v2[1] = currentX+vertStep;
-			v2[2] = lowerRadius * sin(angle);
-			
-			angle = angleStep * horizStep;
-			v3[0] = lowerRadius * cos(angle);
-			v3[1] = currentX+vertStep;
-			v3[2] = lowerRadius * sin(angle);
-
-			b[0] = v2[0] - v1[0];
-			b[1] = v2[1] - v1[1];
-			b[2] = v2[2] - v1[2];
-
-			a[0] = v3[0] - v1[0];
-			a[1] = v3[1] - v1[1];
-			a[2] = v3[2] - v1[2];
-
-			xn = a[1] * b[2] - a[2] * b[1];
-			yn = a[2] * b[0] - a[0] * b[2];
-			zn = a[0] * b[1] - a[1] * b[0];
-
-			glNormal3f(xn, yn, zn);
-			glVertex3f(v1[0], v1[1], v1[2]);	// 3
-			glVertex3f(v2[0], v2[1], v2[2]);	// 4
-			glVertex3f(v3[0], v3[1], v3[2]);	// 2
-		}
-
-		/** WERSJA NA CZWOROKATACH */
-		/*for(int angleStep = 0; angleStep < horizontalSegments; ++angleStep)
-		{
-			// angle to kat obrotu danych wierzcholkow od poczatku obrotu
-			float angle = angleStep * horizStep;
-			// upperRadius to promien bryly na wyzszym poziomie
-			float upperRadius = radius + upperY;
-			// lowerRadius to promien bryly na nizszym poziomie
-			float lowerRadius = radius + lowerY;
-
-			glVertex3f(upperRadius * cos(angle), currentX, upperRadius * sin(angle));
-			glVertex3f(lowerRadius * cos(angle), currentX+vertStep, lowerRadius * sin(angle));
-
-			angle = (angleStep+1) * horizStep;
-			glVertex3f(upperRadius * cos(angle), currentX, upperRadius * sin(angle));
-			glVertex3f(lowerRadius * cos(angle), currentX+vertStep, lowerRadius * sin(angle));
-		}*/
-	}
-				glEnd();
-}
-
-void circle(const float radius, const int segments)
-{
-	float step = 360 / segments;
-	glBegin(GL_TRIANGLES);
-	for(int angleStep = 0; angleStep < segments; ++angleStep)
-	{
-		// angle to kat obrotu danych wierzcholkow od poczatku obrotu
-		float angle = angleStep * step * M_PI / 180;
-		
-		float v1[3];
-		v1[0] = 0;
-		v1[1] = 0;
-		v1[2] = 0;
-
-		float v2[3];
-		v2[0] = 0;
-		v2[1] = radius * sin(angleStep * step * M_PI / 180);
-		v2[2] = radius * cos(angleStep * step * M_PI / 180);
-			
-		float v3[3];
-		v3[0] = 0;
-		v3[1] = radius * sin((angleStep+1) * step * M_PI / 180);
-		v3[2] = radius * cos((angleStep+1) * step * M_PI / 180);
-
-		float b[3];
-		b[0] = v1[0] - v2[0];
-		b[1] = v1[1] - v2[1];
-		b[2] = v1[2] - v2[2];
-
-		float a[3];
-		a[0] = v3[0] - v1[0];
-		a[1] = v3[1] - v1[1];
-		a[2] = v3[2] - v1[2];
-
-		float xn = a[1] * b[2] - a[2] * b[1];
-		float yn = a[2] * b[0] - a[0] * b[2];
-		float zn = a[0] * b[1] - a[1] * b[0];
-
-		glNormal3f(xn, yn, zn);
-		glVertex3f(v1[0], v1[1], v1[2]);
-		glVertex3f(v2[0], v2[1], v2[2]);
-		glVertex3f(v3[0], v3[1], v3[2]);
-	}
-	glEnd();
-}
-
 void mesh(int width, int height);
-
-void dragonfly(int frame_no)
-{
-	// wazka
-
-		//glowa
-		glRotatef(-90, 0, 0, 1);
-		glPushMatrix();
-		
-		glColor3f(0.02, 0.25, 0.42);
-		glTranslatef(0, 2.25, 0);
-		glPushMatrix();		
-			glTranslatef(0.1, -0.1, 0);
-			glRotatef(90, 0, 0, 1);
-			glScalef(0.6, 1, 0.6);
-			glScalef(0.3, 0.3, 0.3);
-			glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-		
-		glColor3f(0.74, 0.22, 0.19);
-		glPushMatrix();		
-			glTranslatef(0, 0, -0.15);
-			glRotatef(15, 0, 1, 0);
-			glRotatef(80, 0, 0, 1);
-			glScalef(0.6, 1, 0.6);
-			glScalef(0.3, 0.3, 0.3);
-			glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-
-		glPushMatrix();		
-			glTranslatef(0, 0, 0.15);
-			glRotatef(-15, 0, 1, 0);
-			glRotatef(80, 0, 0, 1);
-			glScalef(0.6, 1, 0.6);
-			glScalef(0.3, 0.3, 0.3);
-			glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-		glPopMatrix();
-
-		// korpus
-			glColor3f(0.06, 0.52, 0.9);
-		glPushMatrix();
-			glScalef(0.2, 0.7, 0.2);
-			glTranslatef(0, 1.85, 0);
-			lathe(body, -1.06, 1.06, 20, 36, 0.5);
-		glPopMatrix();
-
-		//skrzydla
-		glColor4f(0, 0, 0, 0.5);
-		glPushMatrix();
-			glTranslatef(-0.36, 1.5, 0.17);
-			glRotatef(-10, 1, 0, 0);
-			glScalef(1, 0.15, 1);
-			glRotatef(frame_no % 40 - 20, 0, 1, 0);
-			glTranslatef(0, 0, 2);
-			circle(2, 24);
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(-0.36, 1.2, 0.17);
-			glRotatef(10, 1, 0, 0);
-			glScalef(1, 0.15, 1);
-			glRotatef(frame_no % 40 - 20, 0, 1, 0);
-			glTranslatef(0, 0, 2);
-			circle(2, 24);
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(-0.36, 1.5, -0.17);
-			glRotatef(10, 1, 0, 0);
-			glScalef(1, 0.15, 1);
-			glRotatef(-(frame_no % 40 - 20), 0, 1, 0);
-			glTranslatef(0, 0, -2);
-			circle(2, 24);
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(-0.36, 1.2, -0.17);
-			glRotatef(-10, 1, 0, 0);
-			glScalef(1, 0.15, 1);
-			glRotatef(-(frame_no % 40 - 20), 0, 1, 0);
-			glTranslatef(0, 0, -2);
-			circle(2, 24);
-		glPopMatrix();
-		// ogon
-		glPushMatrix();
-		glColor3f(0.02, 0.25, 0.42);
-			glPushMatrix();
-				glRotatef(-5, 0, 0, 1);
-				glScalef(0.1, 0.4, 0.1);
-				glScalef(1, 0.6, 1);
-				glTranslatef(-0.45, 0.12, 0);
-				lathe(tail, -0.4, 2.5, 50, 36, 0);
-			glPopMatrix();
-
-			glPushMatrix();
-				glRotatef(-6, 0, 0, 1);
-				glScalef(0.1, 0.4, 0.1);
-				glScalef(1, 0.8, 1);
-				glTranslatef(-0.4, -2.2, 0);
-				lathe(tail, -0.4, 2.1, 50, 36, 0);
-			glPopMatrix();
-		
-			glPushMatrix();
-				glRotatef(-7, 0, 0, 1);
-				glScalef(0.1, 0.4, 0.1);
-				glTranslatef(-0.28, -4.04, 0);
-				lathe(tail, -0.4, 2.1, 50, 36, 0);
-			glPopMatrix();
-		
-			glPushMatrix();
-				glRotatef(-9, 0, 0, 1);
-				glScalef(0.1, 0.4, 0.1);
-				glScalef(1, 1.2, 1);
-				glTranslatef(0.32, -5.75, 0);
-				lathe(tail, -0.4, 2.1, 50, 36, 0);
-			glPopMatrix();
-
-			glPushMatrix();
-				glRotatef(-10, 0, 0, 1);
-				glScalef(0.1, 0.4, 0.1);
-				glScalef(1, 1.3, 1);
-				glTranslatef(0.8, -7.7, 0);
-				lathe(tail, -0.4772, 2, 50, 36, 0);
-			glPopMatrix();
-		glPopMatrix();
-}
-
 
 void displayObjects(int frame_no)
 {		
     glEnable(GL_LIGHTING);
     glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/*glBegin(GL_QUADS);
-
-	glColor3f(255, 255, 255);
-	glVertex3f(-2, 2, -2);
-	glVertex3f(-2, -2, -2);
-	glVertex3f(2, -2, -2);
-	glVertex3f(2, 2, -2);
-	
-	glColor3f(255, 0, 0);
-	glVertex3f(-2, 2, 2);
-	glVertex3f(-2, -2, 2);
-	glVertex3f(-2, -2, -2);
-	glVertex3f(-2, 2, -2);
-	
-	glColor3f(0, 255, 0);
-	glVertex3f(2, 2, 2);
-	glVertex3f(2, -2, 2);
-	glVertex3f(2, -2, -2);
-	glVertex3f(2, 2, -2);
-	
-	glColor3f(0, 0, 255);
-	glVertex3f(-2, 2, 2);
-	glVertex3f(-2, -2, 2);
-	glVertex3f(2, -2, 2);
-	glVertex3f(2, 2, 2);
-	glEnd();	
-
-	glPopMatrix();*/
 	
 	glPushMatrix();
 		glPushMatrix();
@@ -602,7 +250,7 @@ void display()
 		//glRotatef(-angleYZ+90, 0, 0, 1);
 		//glRotatef(-angleXZ, 0, 1, 0);
 		glRotatef(90, 0, 1, 0);
-		dragonfly(frame);
+		dragonfly->draw();
 		glPopMatrix();
 	gluLookAt( positionx, positiony, positionz, positionx+centerx, positiony+centery, positionz+centerz, 0, 1, 0 );
 	
@@ -633,10 +281,7 @@ void reshape(GLsizei w, GLsizei h)
    
     // rzutowanie perspektywiczne
     gluPerspective( 90, aspect, 0.1, 50.0 );
-
-	  //cofamy obserwatora do tylu
-	  // z-bufor ma 32 bity - ograniczona rozdzielczosc. odleglosc miedzy scianami bedzie za duza, to potem moga dwa obiekty na tym msamym miejscu 
-    }
+	}
 }
 
 void SpecialKeys( int key, int x, int y )
@@ -780,6 +425,7 @@ int main(int argc, char** argv)
    glutIdleFunc(display);
 
    skybox = new _skybox::Skybox();
+   dragonfly = new Dragonfly();
    init();
    
    oldTime = glutGet(GLUT_ELAPSED_TIME);
