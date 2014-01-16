@@ -18,17 +18,17 @@ class Coordinates
 
 		}
 
-		const float getX()
+		const float getX() const
 		{
 			return x;
 		}
 
-		const float getY()
+		const float getY() const
 		{
 			return y;
 		}
 
-		const float getZ()
+		const float getZ() const
 		{
 			return z;
 		}
