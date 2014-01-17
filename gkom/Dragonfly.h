@@ -14,9 +14,11 @@ class Dragonfly
 		Triangles* bodyTriangles;
 		Triangles* wingsTriangles[4];
 		Triangles* tailTriangles[5];
+
+		float wingsAngle;
+		float wingsSpeed;
 		
 		Triangles* lathe(float(Dragonfly::*generationFunction)(const float), float begin, float end, int verticalSegments = 10, int horizontalSegments = 36, float radius = 2);
-
 		float edge(const float x);
 		float tail(const float x);
 		float body(const float x);

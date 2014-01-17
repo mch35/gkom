@@ -224,6 +224,9 @@ Dragonfly::Dragonfly()
 	tailTriangles[2] = lathe(&Dragonfly::tail, -0.4, 2.1, 50, 36, 0);
 	tailTriangles[3] = lathe(&Dragonfly::tail, -0.4, 2.1, 50, 36, 0);
 	tailTriangles[4] = lathe(&Dragonfly::tail, -0.4772, 2, 50, 36, 0);
+
+	wingsAngle = 0;
+	wingsSpeed = 0.1;
 }
 
 Dragonfly::~Dragonfly()
@@ -246,7 +249,15 @@ Dragonfly::~Dragonfly()
 
 void Dragonfly::draw(const int elapsedTimeMilis)
 {
+	wingsAngle += (elapsedTimeMilis * wingsSpeed);
+
+	if(wingsAngle > 20)
+	{
+		wingsAngle -= 40;
+	}
+
 	glRotatef(-90, 0, 0, 1);
+	glScalef(0.5, 0.5, 0.5);
 		glPushMatrix();		
 			glColor3f(0.02, 0.25, 0.42);
 			glTranslatef(0, 2.25, 0);
@@ -293,7 +304,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 			glTranslatef(-0.36, 1.5, 0.17);
 			glRotatef(-10, 1, 0, 0);
 			glScalef(1, 0.15, 1);
-			//glRotatef(frame_no % 40 - 20, 0, 1, 0);
+			glRotatef(wingsAngle, 0, 1, 0);
 			glTranslatef(0, 0, 2);			
 			drawTriangles(wingsTriangles[0]);
 		glPopMatrix();
@@ -302,7 +313,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 			glTranslatef(-0.36, 1.2, 0.17);
 			glRotatef(10, 1, 0, 0);
 			glScalef(1, 0.15, 1);
-			//glRotatef(frame_no % 40 - 20, 0, 1, 0);
+			glRotatef(wingsAngle, 0, 1, 0);
 			glTranslatef(0, 0, 2);
 			drawTriangles(wingsTriangles[1]);
 		glPopMatrix();
@@ -311,7 +322,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 			glTranslatef(-0.36, 1.5, -0.17);
 			glRotatef(10, 1, 0, 0);
 			glScalef(1, 0.15, 1);
-			//glRotatef(-(frame_no % 40 - 20), 0, 1, 0);
+			glRotatef(-wingsAngle, 0, 1, 0);
 			glTranslatef(0, 0, -2);
 			drawTriangles(wingsTriangles[2]);
 		glPopMatrix();
@@ -320,7 +331,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 			glTranslatef(-0.36, 1.2, -0.17);
 			glRotatef(-10, 1, 0, 0);
 			glScalef(1, 0.15, 1);
-			//glRotatef(-(frame_no % 40 - 20), 0, 1, 0);
+			glRotatef(-wingsAngle, 0, 1, 0);
 			glTranslatef(0, 0, -2);
 			drawTriangles(wingsTriangles[3]);
 		glPopMatrix();

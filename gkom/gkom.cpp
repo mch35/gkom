@@ -15,6 +15,7 @@
 
 #include "Skybox.h"
 #include "Dragonfly.h"
+#include "Camera.h"
 
 GLdouble eyex = 0;
 GLdouble eyey = 0;
@@ -23,7 +24,7 @@ GLdouble eyez = 0;
 GLdouble dx = 0;
 GLdouble dy = 0;
 GLdouble dz = 0;
-
+/*
 GLdouble positionx = eyex;
 GLdouble positiony = eyey;
 GLdouble positionz = eyez;
@@ -32,19 +33,19 @@ GLdouble positionz = eyez;
 
 GLdouble centerx = eyex;
 GLdouble centery = eyey;
-GLdouble centerz = eyez-1;
+GLdouble centerz = eyez-1;*/
 
 int oldX = 0;
 int oldY = 0;
 
 int oldTime = 0;
-
+/*
 float angleXZ = -90;
-float angleYZ = 90;
+float angleYZ = 90;*/
 
 float l = 0;
-
-float sensitivity = -0.5f;
+/*
+float sensitivity = -0.5f;*/
 //GLuint skybox[6];
 
 GLfloat mat_ambient[]    = { 0.2, 0.2,  0.2, 1.0 };
@@ -54,6 +55,7 @@ GLfloat lm_ambient[]     = { l, l, l, 1 };
 
 _skybox::Skybox* skybox;
 Dragonfly* dragonfly;
+Camera* camera;
 
 void init()
 {
@@ -203,7 +205,7 @@ void display()
 	glPushMatrix();
  gluLookAt(
         0, 0, 0,
-        cos(angleXZ * M_PI / 180), cos(angleYZ * M_PI / 180), sin(angleXZ * M_PI / 180), 0, 1, 0 );
+		cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
     // Enable/Disable features
 
 
@@ -240,6 +242,9 @@ void display()
     glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	
+	gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
+			  camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
 	glPushMatrix();
 	float speed = 0.001;
 	//dx+=speed*elapsedTime;
@@ -250,10 +255,8 @@ void display()
 		//glRotatef(-angleYZ+90, 0, 0, 1);
 		//glRotatef(-angleXZ, 0, 1, 0);
 		glRotatef(90, 0, 1, 0);
-		dragonfly->draw();
+		dragonfly->draw(elapsedTime);
 		glPopMatrix();
-	gluLookAt( positionx, positiony, positionz, positionx+centerx, positiony+centery, positionz+centerz, 0, 1, 0 );
-	
 	//glLightfv( GL_LIGHT0, GL_POSITION, light_position );
 	glPushMatrix();
     displayObjects(frame);
@@ -291,34 +294,24 @@ void SpecialKeys( int key, int x, int y )
     {
         // kursor w lewo
     case GLUT_KEY_LEFT:
-        eyez -= step*cos(angleXZ * M_PI / 180);
-		eyex += step*sin(angleXZ * M_PI / 180);
+		camera->move(Camera::Direction::CAMERA_LEFT);
         break;
        
         // kursor w górê
     case GLUT_KEY_UP:
-        eyex += step*cos(angleXZ * M_PI / 180);
-        eyey += step*cos(angleYZ * M_PI / 180);
-		eyez += step*sin(angleXZ * M_PI / 180);
+		camera->move(Camera::Direction::CAMERA_FORWARD);
         break;
        
         // kursor w prawo
-    case GLUT_KEY_RIGHT:        
-        eyez += step*cos(angleXZ * M_PI / 180);
-		eyex -= step*sin(angleXZ * M_PI / 180);
+    case GLUT_KEY_RIGHT:
+		camera->move(Camera::Direction::CAMERA_RIGHT);
         break;
        
         // kursor w dó³
     case GLUT_KEY_DOWN:
-        eyex -= step*cos(angleXZ * M_PI / 180);
-        eyey -= step*cos(angleYZ * M_PI / 180);
-		eyez -= step*sin(angleXZ * M_PI / 180);
+		camera->move(Camera::Direction::CAMERA_BACKWARD);
         break;
     }
-
-	positionx = eyex;
-	positiony = eyey;
-	positionz = eyez;
 	   
     // odrysowanie okna
     reshape( glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT ) );
@@ -330,28 +323,28 @@ void Keyboard( unsigned char key, int x, int y )
     switch(key)
 	{
 		case 'a':
-			dz -= step*cos(angleXZ * M_PI / 180);
-			dx += step*sin(angleXZ * M_PI / 180);
+			dz -= step*cos(camera->getAngleXZ() * M_PI / 180);
+			dx += step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
        
         // kursor w górê
 		case 'w':
-			dx += step*cos(angleXZ * M_PI / 180);
-			dy += step*cos(angleYZ * M_PI / 180);
-			dz += step*sin(angleXZ * M_PI / 180);
+			dx += step*cos(camera->getAngleXZ() * M_PI / 180);
+			dy += step*cos(camera->getAngleYZ() * M_PI / 180);
+			dz += step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
        
         // kursor w prawo
 		case 'd':        
-			dz += step*cos(angleXZ * M_PI / 180);
-			dx -= step*sin(angleXZ * M_PI / 180);
+			dz += step*cos(camera->getAngleXZ() * M_PI / 180);
+			dx -= step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
        
         // kursor w dó³
 		case 's':
-			dx -= step*cos(angleXZ * M_PI / 180);
-			dy -= step*cos(angleYZ * M_PI / 180);
-			dz -= step*sin(angleXZ * M_PI / 180);
+			dx -= step*cos(camera->getAngleXZ() * M_PI / 180);
+			dy -= step*cos(camera->getAngleYZ() * M_PI / 180);
+			dz -= step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
 
 		case '+':        
@@ -373,7 +366,8 @@ void mouseMotion( int x, int y )
 	float dX = oldX - x;
 	float dY = oldY - y;
 
-	angleXZ += sensitivity*dX;
+	camera->rotate(dX, dY);
+	/*angleXZ += sensitivity*dX;
 	angleYZ += sensitivity*dY;
 
 	if(angleXZ < 0) angleXZ += 360;
@@ -384,7 +378,7 @@ void mouseMotion( int x, int y )
 		
 	centerx = cos(angleXZ * M_PI / 180);
 	centery = cos(angleYZ * M_PI / 180);
-	centerz = sin(angleXZ * M_PI / 180);
+	centerz = sin(angleXZ * M_PI / 180);*/
 	
 	oldX = x;
 	oldY = y;
@@ -426,6 +420,7 @@ int main(int argc, char** argv)
 
    skybox = new _skybox::Skybox();
    dragonfly = new Dragonfly();
+   camera = new Camera();
    init();
    
    oldTime = glutGet(GLUT_ELAPSED_TIME);
