@@ -35,6 +35,7 @@ const bool Skybox::loadTexture(const TexPosition texPosition, const char* src)
 void Skybox::draw()
 {
 	// Render the front quad
+
 	if(textures[TexPosition::TX_FRONT] != 0)
 	{
 		glBindTexture(GL_TEXTURE_2D, textures[TexPosition::TX_FRONT]);

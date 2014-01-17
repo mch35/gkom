@@ -1,7 +1,5 @@
 #include "LightsManager.h"
 
-#include <iostream>
-
 LightsManager::LightsManager(float* globalAmbient)
 {
 	for(int i = 0; i < 8; ++i)
@@ -18,10 +16,10 @@ LightsManager::LightsManager(float* globalAmbient)
 	}
 	else
 	{
-		this->globalAmbient[0] = 0.2;
-		this->globalAmbient[1] = 0.2;
-		this->globalAmbient[2] = 0.2;
-		this->globalAmbient[3] = 1;
+		this->globalAmbient[0] = 0.2f;
+		this->globalAmbient[1] = 0.2f;
+		this->globalAmbient[2] = 0.2f;
+		this->globalAmbient[3] = 1.0f;
 	}
 }
 
@@ -70,16 +68,16 @@ void LightsManager::setGlobalAmbient(float* globalAmbient)
 
 void LightsManager::setGlobalAmbientBrighter()
 {
-	this->globalAmbient[0] += 0.1;
-	this->globalAmbient[1] += 0.1;
-	this->globalAmbient[2] += 0.1;
+	this->globalAmbient[0] += 0.1f;
+	this->globalAmbient[1] += 0.1f;
+	this->globalAmbient[2] += 0.1f;
 }
 
 void LightsManager::setGlobalAmbientDarker()
 {
-	this->globalAmbient[0] -= 0.1;
-	this->globalAmbient[1] -= 0.1;
-	this->globalAmbient[2] -= 0.1;
+	this->globalAmbient[0] -= 0.1f;
+	this->globalAmbient[1] -= 0.1f;
+	this->globalAmbient[2] -= 0.1f;
 }
 
 const float* LightsManager::getGlobalAmbient()
@@ -104,7 +102,6 @@ void LightsManager::enableAllLights()
 		if(lights[i] != 0)
 		{
 			lights[i]->enable();
-			std::cout << "wlaczam: " << i << "\n";
 		}
 	}
 }
@@ -122,7 +119,7 @@ void LightsManager::disableAllLights()
 
 LightSource* LightsManager::getLight(int id)
 {
-	if((id - 0x4000 > 0) && (id - 0x4000 < 8))
+	if((id - 0x4000 >= 0) && (id - 0x4000 < 8))
 	{
 		if(lights[id - 0x4000] != 0)
 		{

@@ -16,7 +16,7 @@ void drawTriangles(Triangles* toDraw)
 			glVertex3f(vertices[1]->getX(), vertices[1]->getY(), vertices[1]->getZ());
 			glVertex3f(vertices[2]->getX(), vertices[2]->getY(), vertices[2]->getZ());
 		glEnd();
-	} 
+	}
 }
 
 Triangles* Dragonfly::lathe(float(Dragonfly::*generationFunction)(const float), float begin, float end, int verticalSegments, int horizontalSegments, float radius)
@@ -226,7 +226,7 @@ Dragonfly::Dragonfly()
 	tailTriangles[4] = lathe(&Dragonfly::tail, -0.4772, 2, 50, 36, 0);
 
 	wingsAngle = 0;
-	wingsSpeed = 0.1;
+	wingsSpeed = 0.2;
 }
 
 Dragonfly::~Dragonfly()
@@ -256,6 +256,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 		wingsAngle -= 40;
 	}
 
+	glTranslatef(0, 2, 0);
 	glRotatef(-90, 0, 0, 1);
 	glScalef(0.5, 0.5, 0.5);
 		glPushMatrix();		
@@ -299,7 +300,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 		glPopMatrix();
 
 		//skrzydla
-		glColor4f(0, 0, 0, 0.5);
+		glColor4f(0.7, 0.7, 0.7, 0.2);
 		glPushMatrix();
 			glTranslatef(-0.36, 1.5, 0.17);
 			glRotatef(-10, 1, 0, 0);
@@ -373,7 +374,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 				glRotatef(-10, 0, 0, 1);
 				glScalef(0.1, 0.4, 0.1);
 				glScalef(1, 1.3, 1);
-				glTranslatef(0.8, -7.7, 0);
+				glTranslatef(0.8, -7.6, 0);
 				drawTriangles(tailTriangles[4]);
 			glPopMatrix();
 		glPopMatrix();

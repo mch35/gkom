@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * GKOM Lab. 3: OpenGL
  *
  * Program stanowi zaadaptowana wersje przykladu accnot.c.
@@ -26,22 +26,13 @@ int oldX = 0;
 int oldY = 0;
 
 int oldTime = 0;
-/*
-float l = 0;
-
-float l0 = 0;
-
-GLfloat mat_ambient[]    = { 0.2, 0.2,  0.2, 1.0 };
-GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
-GLfloat light_position[] = { -10.0, 10.0, 10.0, 1.0 };
-GLfloat lm_ambient[]     = { l, l, l, 1 };
-
-GLfloat lm_spec[]     = { l0, l0, l0, 10 };*/
 
 Skybox* skybox;
 Dragonfly* dragonfly;
 Camera* camera;
 LightsManager* lightsManager;
+
+int groundTex = 0;
 
 void init()
 {
@@ -53,104 +44,55 @@ void init()
 	float lightPosition[] = {-10, 10, 10};
 	lightsManager->addLight(GL_LIGHT0, lightPosition);
 
-	// w³¹czenie obs³ugi w³aœciwoœci materia³ów
+	groundTex = SOIL_load_OGL_texture("img/bottom.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+	
+	if( groundTex == 0 )
+	{
+		printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+	}
+
+
+        // wÂ³Â¹czenie obsÂ³ugi wÂ³aÅ“ciwoÅ“ci materiaÂ³Ã³w
     glEnable( GL_COLOR_MATERIAL );
    
-    // w³aœciwoœci materia³u okreœlone przez kolor wierzcho³ków
+    // wÂ³aÅ“ciwoÅ“ci materiaÂ³u okreÅ“lone przez kolor wierzchoÂ³kÃ³w
     glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
 
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glDepthFunc( GL_LESS );
     glEnable( GL_DEPTH_TEST );
 
-	// normalizacja wektorow zeby np swiatlo sie nie psulo przy skalowaniu
-	glEnable(GL_NORMALIZE);
+        // normalizacja wektorow zeby np swiatlo sie nie psulo przy skalowaniu
+        glEnable(GL_NORMALIZE);
 
-	glCullFace(GL_FRONT);
+        glCullFace(GL_FRONT);
 
-	//cieniowanie interpolowane
-	glShadeModel(GL_SMOOTH);
+        //cieniowanie interpolowane
+        glShadeModel(GL_SMOOTH);
 
 }
 
-void mesh(int width, int height);
-
-void displayObjects(int frame_no)
-{		
-	lightsManager->enableLighting();
-
-    glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	glPushMatrix();
-		glPushMatrix();
-		glColor3f(1, 0, 0);
-		glTranslatef(-10, 0, 10);
-		glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-		
-		glPushMatrix();
-		glColor3f(0, 1, 0);
-		glTranslatef(-10, 0, -10);
-		glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-		
-		glPushMatrix();
-		glColor3f(0, 0, 1);
-		glTranslatef(10, 0, 10);
-		glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-		
-		glPushMatrix();
-		glColor3f(0, 0, 0);
-		glTranslatef(10, 0, -10);
-		glutSolidSphere(1, 24, 24);
-		glPopMatrix();
-
-		
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-10, 10, 10);
-		glColor3f(1, 1, 1);
-		glutSolidSphere(0.2, 6, 6);
-	glPopMatrix();
-	
-	glColor3f(1, 1, 1);
-	glPushMatrix();
-
-	lightsManager->disableLighting();
-	mesh(10, 10);
-	glPopMatrix();
-}
-
-void mesh(int width, int height)
+void ground()
 {
-	glLineWidth(2);
-
-	glBegin(GL_LINES);
+	float size = 20;
 	
-	for(int i = 0; i <= width; ++i)
+	if(groundTex != 0)
 	{
-		for(int j = 0; j < height; ++j)
-		{
-			glVertex3f(i, 0, j);
-			glVertex3f(i, 0, j+1);
-		}
+		glBindTexture(GL_TEXTURE_2D, groundTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glColor3f(1, 1, 1);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 0); glVertex3f(  size, 0, -size );
+			glTexCoord2f(1, 0); glVertex3f( -size, 0, -size );
+			glTexCoord2f(1, 1); glVertex3f( -size, 0, size );
+			glTexCoord2f(0, 1); glVertex3f(  size, 0, size );
+		glEnd();
 	}
-
-	for(int i = 0; i <= height; ++i)
-	{
-		for(int j = 0; j < width; ++j)
-		{
-			glVertex3f(j, 0, i);
-			glVertex3f(j+1, 0, i);
-		}
-	}
-
-	glEnd();
 }
 
 int frames = 0;
@@ -159,82 +101,87 @@ int fps = 0;
 
 void display()
 {
-	// czas od ostatniego renderowania	
-	int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	int elapsedTime = currentTime - oldTime;
+        // czas od ostatniego renderowania        
+        int currentTime = glutGet(GLUT_ELAPSED_TIME);
+        int elapsedTime = currentTime - oldTime;
 
-	timeElapsed += elapsedTime;
-	if(timeElapsed >= 1000)
-	{
-		timeElapsed -= 1000;
-				
-		printf("%d\n", frames);
-		frames = 0;
-	}
+        timeElapsed += elapsedTime;
+        if(timeElapsed >= 1000)
+        {
+                timeElapsed -= 1000;
+                                
+                printf("%d\n", frames);
+                frames = 0;
+        }
 
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     
-	glClearColor(0, 0, 0, 1.0 );
+        glClearColor(0, 0, 0, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
-	
-	lightsManager->enableLighting();
-	lightsManager->drawGlobalAmbient();
-
-	glPushMatrix();
-		gluLookAt(0, 0, 0, cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
-    	
-		glPushAttrib(GL_ENABLE_BIT);
-		glEnable(GL_TEXTURE_2D);
-		glDisable(GL_DEPTH_TEST);    
-		glDisable(GL_BLEND);
- 		
-		// rysowanie skyboxa
-		skybox->draw();
- 
-		glPopAttrib();
-    glPopMatrix();
-	      
-    glEnable( GL_COLOR_MATERIAL );
-    glColorMaterial( GL_FRONT, GL_AMBIENT );
-   
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	
-	gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
-			  camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
-	
-	lightsManager->enableAllLights();
-	lightsManager->drawLights();
-
-	glPushMatrix();		
-
-	float speed = 0.001;
-	//dx+=speed*elapsedTime;
-	//dy+=speed*elapsedTime;
-	//dz-=speed*elapsedTime;
-
-		glTranslatef(dx, dy, dz);
-		//glRotatef(-angleYZ+90, 0, 0, 1);
-		//glRotatef(-angleXZ, 0, 1, 0);
-		glRotatef(90, 0, 1, 0);
-		dragonfly->draw(elapsedTime);
-	glPopMatrix();
+                
+        lightsManager->enableLighting();
+        lightsManager->drawGlobalAmbient();
 		
+		glColor3f(1, 1, 1);
+        glPushMatrix();
+                gluLookAt(0, 0, 0, cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
+            
+                glPushAttrib(GL_ENABLE_BIT);
+                glEnable(GL_TEXTURE_2D);
+                glDisable(GL_DEPTH_TEST);
+                glDisable(GL_BLEND);
+                 
+                // rysowanie skyboxa
+                skybox->draw();
+				
+ 
+                glPopAttrib();
+    glPopMatrix();
+        
+    glEnable( GL_COLOR_MATERIAL );
+    glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
+   
+	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+        
+        gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
+                         camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
+        
+        lightsManager->enableAllLights();
+        lightsManager->drawLights();
+		
+		glEnable(GL_TEXTURE_2D);
+        //glDisable(GL_BLEND);
+		glColor3f(1, 1, 1);
+		ground();		
+        //glEnable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
 
-	glPushMatrix();
-		displayObjects(0);
-	glPopMatrix();
+        glPushMatrix();                
 
-	//wyczyszczenie buforow
-	glFlush();
-	glutSwapBuffers();
+        float speed = 0.001;
+        //dx+=speed*elapsedTime;
+        //dy+=speed*elapsedTime;
+        //dz-=speed*elapsedTime;
 
-	oldTime = currentTime;
-	frames++;
+                glTranslatef(dx, dy, dz);
+                //glRotatef(-angleYZ+90, 0, 0, 1);
+                //glRotatef(-angleXZ, 0, 1, 0);
+                glRotatef(90, 0, 1, 0);
+                dragonfly->draw(elapsedTime);
+				
+        glPopMatrix();
+                
+
+        //wyczyszczenie buforow
+        glFlush();
+        glutSwapBuffers();
+
+        oldTime = currentTime;
+        frames++;
 }
 
 void reshape(GLsizei w, GLsizei h)
@@ -264,7 +211,7 @@ void SpecialKeys( int key, int x, int y )
 		camera->move(Camera::Direction::CAMERA_LEFT);
         break;
        
-        // kursor w górê
+        // kursor w gÃ³rÄ™
     case GLUT_KEY_UP:
 		camera->move(Camera::Direction::CAMERA_FORWARD);
         break;
@@ -274,7 +221,7 @@ void SpecialKeys( int key, int x, int y )
 		camera->move(Camera::Direction::CAMERA_RIGHT);
         break;
        
-        // kursor w dó³
+        // kursor w dÃ³Å‚
     case GLUT_KEY_DOWN:
 		camera->move(Camera::Direction::CAMERA_BACKWARD);
         break;
@@ -294,7 +241,7 @@ void Keyboard( unsigned char key, int x, int y )
 			dx += step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
        
-        // kursor w górê
+        // kursor w gÃ³rÄ™
 		case 'w':
 			dx += step*cos(camera->getAngleXZ() * M_PI / 180);
 			dy += step*cos(camera->getAngleYZ() * M_PI / 180);
@@ -307,7 +254,7 @@ void Keyboard( unsigned char key, int x, int y )
 			dx -= step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
        
-        // kursor w dó³
+        // kursor w dÃ³Å‚
 		case 's':
 			dx -= step*cos(camera->getAngleXZ() * M_PI / 180);
 			dy -= step*cos(camera->getAngleYZ() * M_PI / 180);
@@ -318,9 +265,18 @@ void Keyboard( unsigned char key, int x, int y )
 			lightsManager->setGlobalAmbientBrighter();
 			break;
        
-        // kursor w dó³
+        // kursor w dÃ³Å‚
 		case '-':
 			lightsManager->setGlobalAmbientDarker();
+			break;
+
+		case '1':
+			lightsManager->getLight(GL_LIGHT0)->brighter();
+			break;
+       
+        // kursor w dÃ³Å‚
+		case '2':
+			lightsManager->getLight(GL_LIGHT0)->darker();
 			break;
     }
    

@@ -1,5 +1,7 @@
 #include "LightSource.h"
 
+#include <iostream>
+
 LightSource::LightSource(int id, float* position) : id(id)
 {
 	this->position[0] = position[0];
@@ -16,11 +18,14 @@ LightSource::LightSource(int id, float* position) : id(id)
 
 LightSource::~LightSource()
 {
-	delete position;
+	
 }
 
 void LightSource::draw()
 {
+	glLightfv(id, GL_AMBIENT, ambient);
+	glLightfv(id, GL_DIFFUSE, diffuse);
+	glLightfv(id, GL_SPECULAR, specular);
 	glLightfv(id, GL_POSITION, position);
 }
 
@@ -42,7 +47,6 @@ void LightSource::setAmbient(float r, float g, float b, float a)
 	ambient[1] = g;
 	ambient[2] = b;
 	ambient[3] = a;
-	glLightfv(id, GL_AMBIENT, ambient);
 }
 
 void LightSource::setDiffuse(float r, float g, float b, float a)
@@ -51,7 +55,6 @@ void LightSource::setDiffuse(float r, float g, float b, float a)
 	diffuse[1] = g;
 	diffuse[2] = b;
 	diffuse[3] = a;
-	glLightfv(id, GL_DIFFUSE, diffuse);
 }
 
 void LightSource::setSpecular(float r, float g, float b, float a)
@@ -60,7 +63,22 @@ void LightSource::setSpecular(float r, float g, float b, float a)
 	specular[1] = g;
 	specular[2] = b;
 	specular[3] = a;
-	glLightfv(id, GL_SPECULAR, specular);
+}
+
+void LightSource::brighter()
+{
+	this->diffuse[0] += 0.1;
+	this->diffuse[1] += 0.1;
+	this->diffuse[2] += 0.1;
+	//diffuse[3] += 0.1;
+}
+
+void LightSource::darker()
+{
+	diffuse[0] -= 0.1f;
+	diffuse[1] -= 0.1f;
+	diffuse[2] -= 0.1f;
+	//diffuse[3] -= 0.1;
 }
 
 void LightSource::enable()
