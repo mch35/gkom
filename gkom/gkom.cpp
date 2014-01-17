@@ -17,41 +17,24 @@
 #include "Dragonfly.h"
 #include "Camera.h"
 
-GLdouble eyex = 0;
-GLdouble eyey = 0;
-GLdouble eyez = 0;
-
 GLdouble dx = 0;
 GLdouble dy = 0;
 GLdouble dz = 0;
-/*
-GLdouble positionx = eyex;
-GLdouble positiony = eyey;
-GLdouble positionz = eyez;
-
-// wspó³rzêdne punktu w którego kierunku jest zwrócony obserwator,
-
-GLdouble centerx = eyex;
-GLdouble centery = eyey;
-GLdouble centerz = eyez-1;*/
 
 int oldX = 0;
 int oldY = 0;
 
 int oldTime = 0;
-/*
-float angleXZ = -90;
-float angleYZ = 90;*/
-
 float l = 0;
-/*
-float sensitivity = -0.5f;*/
-//GLuint skybox[6];
+
+float l0 = 0;
 
 GLfloat mat_ambient[]    = { 0.2, 0.2,  0.2, 1.0 };
 GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
-//GLfloat light_position[] = { 0.0, 10.0, 10.0, 1.0 };
+GLfloat light_position[] = { -10.0, 10.0, 10.0, 1.0 };
 GLfloat lm_ambient[]     = { l, l, l, 1 };
+
+GLfloat lm_spec[]     = { l0, l0, l0, 10 };
 
 _skybox::Skybox* skybox;
 Dragonfly* dragonfly;
@@ -59,10 +42,9 @@ Camera* camera;
 
 void init()
 {
-
-    
-
-    //glLightfv( GL_LIGHT0, GL_POSITION, light_position );
+    glLightfv( GL_LIGHT0, GL_POSITION, light_position );
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lm_ambient); // rozproszone
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lm_ambient); // odbite
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient );
     
 	//cianiowanie plaskie
@@ -135,6 +117,12 @@ void displayObjects(int frame_no)
 		glPopMatrix();
 
 		
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-10, 10, 10);
+		glColor3f(1, 1, 1);
+		glutSolidSphere(0.2, 6, 6);
 	glPopMatrix();
 	
 	glColor3f(1, 1, 1);
@@ -234,6 +222,9 @@ void display()
    
     // parametry globalnego œwiat³a otaczaj¹cego
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient );
+	glEnable(GL_LIGHT0);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lm_ambient);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, lm_ambient);
    
     glEnable( GL_COLOR_MATERIAL );
     glColorMaterial( GL_FRONT, GL_AMBIENT );
@@ -257,7 +248,7 @@ void display()
 		glRotatef(90, 0, 1, 0);
 		dragonfly->draw(elapsedTime);
 		glPopMatrix();
-	//glLightfv( GL_LIGHT0, GL_POSITION, light_position );
+	glLightfv( GL_LIGHT0, GL_POSITION, light_position );
 	glPushMatrix();
     displayObjects(frame);
 	glPopMatrix();
@@ -353,6 +344,15 @@ void Keyboard( unsigned char key, int x, int y )
        
         // kursor w dó³
 		case '-':
+			l -= 0.1;
+			break;
+
+		case '1':        
+			l += 0.1;
+			break;
+       
+        // kursor w dó³
+		case '2':
 			l -= 0.1;
 			break;
     }

@@ -72,33 +72,32 @@ void Camera::rotate(float inXZ, float inYZ)
 
 void Camera::move(const Camera::Direction dir)
 {
-		float step = 0.1;
 	switch( dir )
     {
 			// kursor w lewo
 		case Direction::CAMERA_LEFT:
-			position->setZ(position->getZ() - step*cos(angleXZ * M_PI / 180));
-			position->setX(position->getX() + step*sin(angleXZ * M_PI / 180));
+			position->setZ(position->getZ() - movingSpeed*cos(angleXZ * M_PI / 180));
+			position->setX(position->getX() + movingSpeed*sin(angleXZ * M_PI / 180));
 			break;
        
 			// kursor w górê
 		case Direction::CAMERA_FORWARD:		
-			position->setX(position->getX() + step*cos(angleXZ * M_PI / 180));
-			position->setY(position->getY() + step*cos(angleYZ * M_PI / 180));
-			position->setZ(position->getZ() + step*sin(angleXZ * M_PI / 180));
+			position->setX(position->getX() + movingSpeed*cos(angleXZ * M_PI / 180));
+			position->setY(position->getY() + movingSpeed*cos(angleYZ * M_PI / 180));
+			position->setZ(position->getZ() + movingSpeed*sin(angleXZ * M_PI / 180));
 			break;
        
 			// kursor w prawo
 		case Direction::CAMERA_RIGHT:        
-			position->setZ(position->getZ() + step*cos(angleXZ * M_PI / 180));
-			position->setX(position->getX() - step*sin(angleXZ * M_PI / 180));
+			position->setZ(position->getZ() + movingSpeed*cos(angleXZ * M_PI / 180));
+			position->setX(position->getX() - movingSpeed*sin(angleXZ * M_PI / 180));
 			break;
        
 			// kursor w dó³
 		case Direction::CAMERA_BACKWARD:
-			position->setX(position->getX() - step*cos(angleXZ * M_PI / 180));
-			position->setY(position->getY() - step*cos(angleYZ * M_PI / 180));
-			position->setZ(position->getZ() - step*sin(angleXZ * M_PI / 180));
+			position->setX(position->getX() - movingSpeed*cos(angleXZ * M_PI / 180));
+			position->setY(position->getY() - movingSpeed*cos(angleYZ * M_PI / 180));
+			position->setZ(position->getZ() - movingSpeed*sin(angleXZ * M_PI / 180));
 			break;
     }
 }
