@@ -1,8 +1,6 @@
 #include "Skybox.h"
 #include <cstdio>
 
-using namespace _skybox;
-
 Skybox::Skybox()
 {
 	loadTexture(TexPosition::TX_FRONT, "img/front.jpg");

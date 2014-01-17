@@ -14,6 +14,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dragonfly.cpp" />
     <ClCompile Include="gkom.cpp" />
+    <ClCompile Include="LightsManagercpp.cpp" />
+    <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
@@ -22,6 +24,8 @@
     <ClInclude Include="Coordinates.h" />
     <ClInclude Include="Dragonfly.h" />
     <ClInclude Include="GLUT.H" />
+    <ClInclude Include="LightsManager.h" />
+    <ClInclude Include="LightSource.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Triangles.h" />

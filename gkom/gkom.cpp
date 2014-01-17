@@ -16,6 +16,7 @@
 #include "Skybox.h"
 #include "Dragonfly.h"
 #include "Camera.h"
+#include "LightsManager.h"
 
 GLdouble dx = 0;
 GLdouble dy = 0;
@@ -25,6 +26,7 @@ int oldX = 0;
 int oldY = 0;
 
 int oldTime = 0;
+/*
 float l = 0;
 
 float l0 = 0;
@@ -34,38 +36,28 @@ GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
 GLfloat light_position[] = { -10.0, 10.0, 10.0, 1.0 };
 GLfloat lm_ambient[]     = { l, l, l, 1 };
 
-GLfloat lm_spec[]     = { l0, l0, l0, 10 };
+GLfloat lm_spec[]     = { l0, l0, l0, 10 };*/
 
-_skybox::Skybox* skybox;
+Skybox* skybox;
 Dragonfly* dragonfly;
 Camera* camera;
+LightsManager* lightsManager;
 
 void init()
 {
-    glLightfv( GL_LIGHT0, GL_POSITION, light_position );
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lm_ambient); // rozproszone
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lm_ambient); // odbite
-    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient );
-    
-	//cianiowanie plaskie
-    //glShadeModel( GL_FLAT );
+	skybox = new Skybox();
+	dragonfly = new Dragonfly();
+	camera = new Camera();
+	lightsManager = new LightsManager(LightsManager::GLOBAL_AMBIENT_DEFAULT);
 
-    glEnable( GL_LIGHTING );
-    glDisable( GL_LIGHT0 );
-
-	glDisable( GL_LIGHT1 );
-	glDisable( GL_LIGHT2 );
-	glDisable( GL_LIGHT3 );
-	glDisable( GL_LIGHT4 );
-	glDisable( GL_LIGHT5 );
-	glDisable( GL_LIGHT6 );
-	glDisable( GL_LIGHT7 );
+	float lightPosition[] = {-10, 10, 10};
+	lightsManager->addLight(GL_LIGHT0, lightPosition);
 
 	// w³¹czenie obs³ugi w³aœciwoœci materia³ów
     glEnable( GL_COLOR_MATERIAL );
    
     // w³aœciwoœci materia³u okreœlone przez kolor wierzcho³ków
-    glColorMaterial( GL_FRONT, GL_AMBIENT );
+    glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
 
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -87,7 +79,8 @@ void mesh(int width, int height);
 
 void displayObjects(int frame_no)
 {		
-    glEnable(GL_LIGHTING);
+	lightsManager->enableLighting();
+
     glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
@@ -127,7 +120,8 @@ void displayObjects(int frame_no)
 	
 	glColor3f(1, 1, 1);
 	glPushMatrix();
-    glDisable(GL_LIGHTING);
+
+	lightsManager->disableLighting();
 	mesh(10, 10);
 	glPopMatrix();
 }
@@ -165,8 +159,7 @@ int fps = 0;
 
 void display()
 {
-	// czyscimy bufory koloru i glebokosci
-	
+	// czas od ostatniego renderowania	
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int elapsedTime = currentTime - oldTime;
 
@@ -179,53 +172,30 @@ void display()
 		frames = 0;
 	}
 
-
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
-    glClearColor(0, 0, 0, 1.0 );
+    
+	glClearColor(0, 0, 0, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	static int frame = 0;
+	
+	
+	lightsManager->enableLighting();
+	lightsManager->drawGlobalAmbient();
 
-	frame == 359 ? frame = 0 : ++frame;
-
-	//gluLookAt( positionx, positiony, positionz, positionx+centerx, positiony+centery, positionz+centerz, 0, 1, 0 );
-			
 	glPushMatrix();
- gluLookAt(
-        0, 0, 0,
-		cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
-    // Enable/Disable features
-
-
-	
-    glPushAttrib(GL_ENABLE_BIT);
-	glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-
-	float lm_ambient[] = { l, l, l, 1 };
-
-	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient );
-    glDisable(GL_BLEND);
+		gluLookAt(0, 0, 0, cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
+    	
+		glPushAttrib(GL_ENABLE_BIT);
+		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_DEPTH_TEST);    
+		glDisable(GL_BLEND);
+ 		
+		// rysowanie skyboxa
+		skybox->draw();
  
-    // Just in case we set all vertices to white.
-    glColor3f(0.5,0.5,0.5);
-
-	// rysowanie skyboxa
-	skybox->draw();
- 
-    // Restore enable bits and matrix
-    glPopAttrib();
+		glPopAttrib();
     glPopMatrix();
-	
-	glEnable( GL_LIGHTING );
-   
-    // parametry globalnego œwiat³a otaczaj¹cego
-    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient );
-	glEnable(GL_LIGHT0);
-	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lm_ambient);
-	//glLightfv(GL_LIGHT0, GL_SPECULAR, lm_ambient);
-   
+	      
     glEnable( GL_COLOR_MATERIAL );
     glColorMaterial( GL_FRONT, GL_AMBIENT );
    
@@ -236,7 +206,12 @@ void display()
 	
 	gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
 			  camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
-	glPushMatrix();
+	
+	lightsManager->enableAllLights();
+	lightsManager->drawLights();
+
+	glPushMatrix();		
+
 	float speed = 0.001;
 	//dx+=speed*elapsedTime;
 	//dy+=speed*elapsedTime;
@@ -247,10 +222,11 @@ void display()
 		//glRotatef(-angleXZ, 0, 1, 0);
 		glRotatef(90, 0, 1, 0);
 		dragonfly->draw(elapsedTime);
-		glPopMatrix();
-	glLightfv( GL_LIGHT0, GL_POSITION, light_position );
+	glPopMatrix();
+		
+
 	glPushMatrix();
-    displayObjects(frame);
+		displayObjects(0);
 	glPopMatrix();
 
 	//wyczyszczenie buforow
@@ -338,22 +314,13 @@ void Keyboard( unsigned char key, int x, int y )
 			dz -= step*sin(camera->getAngleXZ() * M_PI / 180);
 			break;
 
-		case '+':        
-			l += 0.1;
+		case '+':
+			lightsManager->setGlobalAmbientBrighter();
 			break;
        
         // kursor w dó³
 		case '-':
-			l -= 0.1;
-			break;
-
-		case '1':        
-			l += 0.1;
-			break;
-       
-        // kursor w dó³
-		case '2':
-			l -= 0.1;
+			lightsManager->setGlobalAmbientDarker();
 			break;
     }
    
@@ -418,9 +385,7 @@ int main(int argc, char** argv)
 
    glutIdleFunc(display);
 
-   skybox = new _skybox::Skybox();
-   dragonfly = new Dragonfly();
-   camera = new Camera();
+   
    init();
    
    oldTime = glutGet(GLUT_ELAPSED_TIME);
