@@ -11,10 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Dragonfly.cpp" />
     <ClCompile Include="gkom.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Coordinates.h" />
+    <ClInclude Include="Dragonfly.h" />
     <ClInclude Include="GLUT.H" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="Triangles.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8DC2764A-414B-4ED7-B2AC-AC8DB185E61F}</ProjectGuid>
