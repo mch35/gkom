@@ -12,10 +12,13 @@ class LightSource
 		const int id;
 		bool isTurnedOn;
 
-		float position[3];
+		float position[4];
 		float ambient[4];
 		float diffuse[4];
 		float specular[4];
+
+		float direction[3];
+		float spotCutOff;
 
 	public:
 		LightSource(int id, float* position);
@@ -29,6 +32,9 @@ class LightSource
 		void setAmbient(float r, float g, float b, float a);
 		void setDiffuse(float r, float g, float b, float a);
 		void setSpecular(float r, float g, float b, float a);
+						
+		void setDirection(float* direction);
+		void setSpotCutOff(float angle);
 
 		void brighter();
 		void darker();

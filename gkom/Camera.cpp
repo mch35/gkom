@@ -3,7 +3,7 @@
 #include <cmath>
 Camera::Camera() : angleXZ(-90), angleYZ(90)
 {
-	this->position = new Coordinates(0, 0, 0);
+	this->position = new Coordinates(-3, 5, 3);
 	this->direction = new Coordinates(0, 0, -1);
 
 	this->movingSpeed = 0.1;

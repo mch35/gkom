@@ -41,8 +41,15 @@ void init()
 	camera = new Camera();
 	lightsManager = new LightsManager(LightsManager::GLOBAL_AMBIENT_DEFAULT);
 
-	float lightPosition[] = {-10, 10, 10};
+	float lightPosition[] = {-10, 10, 10, 1};
 	lightsManager->addLight(GL_LIGHT0, lightPosition);
+
+	float lightPosition2[] = {0, 10, 0, 1};
+	lightsManager->addLight(GL_LIGHT1, lightPosition2);
+
+	float direction[] = {0, -1, 0};
+	lightsManager->getLight(GL_LIGHT1)->setDirection(direction);
+	lightsManager->getLight(GL_LIGHT1)->setSpotCutOff(30);
 
 	groundTex = SOIL_load_OGL_texture("img/bottom.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
 	
@@ -83,14 +90,26 @@ void ground()
 		glBindTexture(GL_TEXTURE_2D, groundTex);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glColor3f(1, 1, 1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		//glColor3f(1, 1, 1);
 		glBegin(GL_QUADS);
-			glTexCoord2f(0, 0); glVertex3f(  size, 0, -size );
-			glTexCoord2f(1, 0); glVertex3f( -size, 0, -size );
-			glTexCoord2f(1, 1); glVertex3f( -size, 0, size );
-			glTexCoord2f(0, 1); glVertex3f(  size, 0, size );
+			glNormal3f(0, 1, 0);
+			float tex = 0.0f;
+			float texstep = 0.25f;
+			float step = 0.25f;
+			for(float j = -size; j <= size; j+=step)
+			{
+				for(float i = -size; i <= size; i+=step)
+				{
+					glTexCoord2f(tex, tex); glVertex3f(  j, 0, i );
+					glTexCoord2f(tex, tex+texstep); glVertex3f( j, 0, i+step );
+					glTexCoord2f(tex+texstep, tex+tex+0.25f); glVertex3f( j+step, 0, i+step );
+					glTexCoord2f(tex+texstep, tex); glVertex3f(  j+step, 0, i );
+
+					tex += texstep;
+				}
+			}
 		glEnd();
 	}
 }
@@ -120,7 +139,7 @@ void display()
         glClearColor(0, 0, 0, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
                 
-        lightsManager->enableLighting();
+        lightsManager->disableLighting();
         lightsManager->drawGlobalAmbient();
 		
 		glColor3f(1, 1, 1);
@@ -138,7 +157,8 @@ void display()
  
                 glPopAttrib();
     glPopMatrix();
-        
+	
+	lightsManager->enableLighting();
     glEnable( GL_COLOR_MATERIAL );
     glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
    
@@ -146,7 +166,8 @@ void display()
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-        
+	glLoadIdentity();
+	glPushMatrix();    
         gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
                          camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
         
@@ -174,7 +195,7 @@ void display()
                 dragonfly->draw(elapsedTime);
 				
         glPopMatrix();
-                
+	glPopMatrix();        
 
         //wyczyszczenie buforow
         glFlush();
@@ -277,6 +298,15 @@ void Keyboard( unsigned char key, int x, int y )
         // kursor w dół
 		case '2':
 			lightsManager->getLight(GL_LIGHT0)->darker();
+			break;
+
+		case '3':
+			lightsManager->getLight(GL_LIGHT1)->brighter();
+			break;
+       
+        // kursor w dół
+		case '4':
+			lightsManager->getLight(GL_LIGHT1)->darker();
 			break;
     }
    

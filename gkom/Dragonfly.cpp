@@ -265,7 +265,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 			glPushMatrix();		
 				glTranslatef(0.1, -0.1, 0);
 				glRotatef(90, 0, 0, 1);
-				glScalef(0.6, 1, 0.6);
+				glScalef(0.6, 0.8, 0.6);
 				glScalef(0.3, 0.3, 0.3);
 				glutSolidSphere(1, 24, 24);
 			glPopMatrix();
@@ -275,7 +275,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 				glTranslatef(0, 0, -0.15);
 				glRotatef(15, 0, 1, 0);
 				glRotatef(80, 0, 0, 1);
-				glScalef(0.6, 1, 0.6);
+				glScalef(0.4, 0.4, 0.4);
 				glScalef(0.3, 0.3, 0.3);
 				glutSolidSphere(1, 24, 24);
 			glPopMatrix();
@@ -284,7 +284,7 @@ void Dragonfly::draw(const int elapsedTimeMilis)
 				glTranslatef(0, 0, 0.15);
 				glRotatef(-15, 0, 1, 0);
 				glRotatef(80, 0, 0, 1);
-				glScalef(0.6, 1, 0.6);
+				glScalef(0.4, 0.4, 0.4);
 				glScalef(0.3, 0.3, 0.3);
 				glutSolidSphere(1, 24, 24);
 			glPopMatrix();
