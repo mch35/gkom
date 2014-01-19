@@ -65,19 +65,19 @@ void init()
     // w³aœciwoœci materia³u okreœlone przez kolor wierzcho³ków
     glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
 
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glDepthFunc( GL_LESS );
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
     glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
 
-        // normalizacja wektorow zeby np swiatlo sie nie psulo przy skalowaniu
-        glEnable(GL_NORMALIZE);
+    // normalizacja wektorow zeby np swiatlo sie nie psulo przy skalowaniu
+    glEnable(GL_NORMALIZE);
 
-        glCullFace(GL_FRONT);
+    glCullFace(GL_FRONT);
 
-        //cieniowanie interpolowane
-        glShadeModel(GL_SMOOTH);
+    
+    glShadeModel(GL_SMOOTH);
 
 }
 
@@ -92,23 +92,25 @@ void ground()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//glColor3f(1, 1, 1);
+
 		glBegin(GL_QUADS);
 			glNormal3f(0, 1, 0);
-			float tex = 0.0f;
-			float texstep = 0.25f;
+			float texS = 0.0f;
+			float texT = 0.0f;
+			float texstep = 0.04f;
 			float step = 0.25f;
 			for(float j = -size; j <= size; j+=step)
 			{
 				for(float i = -size; i <= size; i+=step)
 				{
-					glTexCoord2f(tex, tex); glVertex3f(  j, 0, i );
-					glTexCoord2f(tex, tex+texstep); glVertex3f( j, 0, i+step );
-					glTexCoord2f(tex+texstep, tex+tex+0.25f); glVertex3f( j+step, 0, i+step );
-					glTexCoord2f(tex+texstep, tex); glVertex3f(  j+step, 0, i );
+					glTexCoord2f(texS, texT); glVertex3f(  j, 0, i );
+					glTexCoord2f(texS, texT+texstep); glVertex3f( j, 0, i+step );
+					glTexCoord2f(texS+texstep, texT+texstep); glVertex3f( j+step, 0, i+step );
+					glTexCoord2f(texS+texstep, texT); glVertex3f(  j+step, 0, i );
 
-					tex += texstep;
+					texS += texstep;
 				}
+				texT += texstep;
 			}
 		glEnd();
 	}
@@ -136,29 +138,29 @@ void display()
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     
-        glClearColor(0, 0, 0, 1.0 );
+    glClearColor(0, 0, 0, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
                 
-        lightsManager->disableLighting();
-        lightsManager->drawGlobalAmbient();
+    lightsManager->enableLighting();
+    lightsManager->drawGlobalAmbient();
 		
-		glColor3f(1, 1, 1);
-        glPushMatrix();
-                gluLookAt(0, 0, 0, cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
+	glColor3f(1, 1, 1);
+    glPushMatrix();
+            gluLookAt(0, 0, 0, cos(camera->getAngleXZ() * M_PI / 180), cos(camera->getAngleYZ() * M_PI / 180), sin(camera->getAngleXZ() * M_PI / 180), 0, 1, 0 );
             
-                glPushAttrib(GL_ENABLE_BIT);
-                glEnable(GL_TEXTURE_2D);
-                glDisable(GL_DEPTH_TEST);
-                glDisable(GL_BLEND);
+            glPushAttrib(GL_ENABLE_BIT);
+            glEnable(GL_TEXTURE_2D);
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
                  
-                // rysowanie skyboxa
-                skybox->draw();
-				
+            // rysowanie skyboxa
+            skybox->draw();
  
-                glPopAttrib();
+            glPopAttrib();
     glPopMatrix();
 	
 	lightsManager->enableLighting();
+
     glEnable( GL_COLOR_MATERIAL );
     glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
    
@@ -167,58 +169,55 @@ void display()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 	glLoadIdentity();
+
 	glPushMatrix();    
         gluLookAt(camera->getPosition().getX(), camera->getPosition().getY(), camera->getPosition().getZ(),
                          camera->getPosition().getX()+camera->getDirection().getX(), camera->getPosition().getY()+camera->getDirection().getY(), camera->getPosition().getZ()+camera->getDirection().getZ(), 0, 1, 0 );
         
         lightsManager->enableAllLights();
         lightsManager->drawLights();
-		
+
+		glPushMatrix();
+			glTranslatef(0, 10, 0);
+			glRotatef(-90, 1, 0, 0);
+			glutSolidCone(0.5, 0.5, 30, 5);
+		glPopMatrix();
+
 		glEnable(GL_TEXTURE_2D);
-        //glDisable(GL_BLEND);
 		glColor3f(1, 1, 1);
-		ground();		
-        //glEnable(GL_BLEND);
+		ground();
 		glDisable(GL_TEXTURE_2D);
 
-        glPushMatrix();                
-
-        float speed = 0.001;
-        //dx+=speed*elapsedTime;
-        //dy+=speed*elapsedTime;
-        //dz-=speed*elapsedTime;
-
-                glTranslatef(dx, dy, dz);
-                //glRotatef(-angleYZ+90, 0, 0, 1);
-                //glRotatef(-angleXZ, 0, 1, 0);
-                glRotatef(90, 0, 1, 0);
-                dragonfly->draw(elapsedTime);
-				
+        glPushMatrix();
+			glTranslatef(dx, dy, dz);
+			glRotatef(90, 0, 1, 0);
+			dragonfly->draw(elapsedTime);				
         glPopMatrix();
 	glPopMatrix();        
 
-        //wyczyszczenie buforow
-        glFlush();
-        glutSwapBuffers();
+    glFlush();
+    glutSwapBuffers();
 
-        oldTime = currentTime;
-        frames++;
+    oldTime = currentTime;
+    frames++;
 }
 
 void reshape(GLsizei w, GLsizei h)
 {
-    if( h > 0 && w > 0 ) {
-		// to bedzie dostepne dla openGLa
-      glViewport( 0, 0, w, h );
-      glMatrixMode( GL_PROJECTION );
-      glLoadIdentity();
+    if( h > 0 && w > 0 )
+	{
+		glViewport( 0, 0, w, h );
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
       
-	  GLdouble aspect = 1;
-    if( h > 0 )
-         aspect = w /( GLdouble ) h;
+		GLdouble aspect = 1;
+		if( h > 0 )
+		{
+			aspect = w /( GLdouble ) h;
+		}
    
-    // rzutowanie perspektywiczne
-    gluPerspective( 90, aspect, 0.1, 50.0 );
+		// rzutowanie perspektywiczne
+		gluPerspective( 90, aspect, 0.1, 50.0 );
 	}
 }
 
@@ -320,18 +319,6 @@ void mouseMotion( int x, int y )
 	float dY = oldY - y;
 
 	camera->rotate(dX, dY);
-	/*angleXZ += sensitivity*dX;
-	angleYZ += sensitivity*dY;
-
-	if(angleXZ < 0) angleXZ += 360;
-	else if(angleXZ >= 360) angleXZ -= 360;
-
-	if(angleYZ < 0) angleYZ = 0;
-	else if(angleYZ >= 180) angleYZ = 180;
-		
-	centerx = cos(angleXZ * M_PI / 180);
-	centery = cos(angleYZ * M_PI / 180);
-	centerz = sin(angleXZ * M_PI / 180);*/
 	
 	oldX = x;
 	oldY = y;
@@ -348,7 +335,6 @@ void firstMotion( int x, int y )
 
 int main(int argc, char** argv)
 {
-	// inicjuje glut i jej wspolprace z sys okienkowym
    glutInit( &argc, argv );
    //bufor glebokosci z-bufor
    // poj buforowanie
@@ -358,7 +344,7 @@ int main(int argc, char** argv)
    glutInitWindowPosition( 100, 100 );
    glutInitWindowSize( 1200, 1024 );
 
-   glutCreateWindow( "GPOB: OpenGL" );
+   glutCreateWindow( "OpenGL: Dragonfly" );
 
    glutDisplayFunc( display );
    glutReshapeFunc( reshape );
@@ -370,8 +356,7 @@ int main(int argc, char** argv)
    glutPassiveMotionFunc(firstMotion);
 
    glutIdleFunc(display);
-
-   
+      
    init();
    
    oldTime = glutGet(GLUT_ELAPSED_TIME);
